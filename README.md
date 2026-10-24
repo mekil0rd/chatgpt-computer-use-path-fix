@@ -44,8 +44,9 @@ Press any key to continue...
 
 Checking your Codex installation...
 Codex executable: C:\Users\<WindowsUser>\AppData\Local\OpenAI\Codex\bin\<CodexFolder>\codex.exe
-User PATH: UPDATED (backup: C:\Users\<WindowsUser>\codex-path-backup-YYYYMMDD-HHMMSS.txt)
+User PATH: UPDATED (backup: C:\Users\<WindowsUser>\codex-path-backup-YYYYMMDD-HHMMSS-mmm-<unique-id>.txt)
 Found via PATH in this terminal: True
+Saved User PATH: VERIFIED
 Codex version: codex-cli 0.164.0-alpha.11.1
 NEXT: Open ChatGPT again, select Work > On my computer, and retry Computer Use.
 If still broken, sign out of Windows and sign back in, then retry.
@@ -60,6 +61,7 @@ Usernames, paths, timestamps, and version numbers vary by computer.
 | `User PATH: UPDATED` | The previous User PATH was backed up and the updated value was saved. |
 | `User PATH: already correctly configured.` | The selected folder is already configured; no new backup is needed. |
 | `Found via PATH in this terminal: True` | Codex can be found in the current terminal. |
+| `Saved User PATH: VERIFIED` | The stored User PATH matches the intended value. |
 | `Codex version:` | The selected executable returned a recognized version. |
 | `FAILED:` | Read the error; do not treat the run as a successful fix. |
 
@@ -68,16 +70,30 @@ The final confirmation is that Computer Use works after reopening ChatGPT.
 ## Requirements
 
 - Windows with the built-in **Windows PowerShell 5.1**.
-- An existing desktop app installation with a Codex executable under `%LOCALAPPDATA%\OpenAI\Codex\bin`.
+- An existing desktop app installation using one of the supported paths listed below.
 - Permission to run a batch file and PowerShell commands on the computer. Organization-managed application controls can still prevent execution.
+
+## Supported installation paths
+
+The utility uses each Windows account's own `LOCALAPPDATA`, `USERPROFILE`, and `SystemRoot` values. No username or Windows drive is hard-coded.
+
+It checks these layouts:
+
+```text
+%LOCALAPPDATA%\OpenAI\Codex\bin\<version-folder>\codex.exe
+%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe
+```
+
+When available, the running app-server's executable is tried first. Other candidates are tried by file modification time, newest first. An unusable candidate is skipped; each version check has a 10-second limit. If no usable executable is found, the utility stops before changing User PATH. Different installation layouts require separate investigation.
 
 ## What the utility does
 
-- Finds an existing local `codex.exe`, using process information when available and installed files as a fallback.
+- Finds and tests existing Codex executables in the supported locations, with fallback between candidates.
 - Checks its exit code and version; native warning messages alone do not fail a valid version check.
 - Backs up User PATH before changing it.
 - Replaces old per-version Codex folder entries with the selected folder, preserving unrelated entries.
-- Verifies command discovery in the current terminal.
+- Reads the saved User PATH back to verify it, and verifies that command discovery selects the chosen executable.
+- On a post-write verification failure, restores the previous User PATH if its value still matches the utility's update. If another process changed it, automatic restoration is skipped to avoid overwriting that change.
 
 It does not download or install software, modify Machine PATH, or request Administrator privileges.
 
@@ -105,7 +121,13 @@ The utility prints the exact backup location. To undo the change, restore the ba
 
 ## Limits
 
-A missing Codex installation must be resolved separately. A successful version check does not guarantee all Computer Use features work. Future app updates can change the executable location and require checking PATH again.
+A missing or unsupported Codex installation must be resolved separately. The utility refuses ambiguous semicolon-containing installation paths and overly long User PATH values before writing. A successful version check does not guarantee all Computer Use features work. Future app updates can change the executable location and require checking PATH again.
+
+## Validation
+
+The reviewed version passed 16 isolated scenarios covering missing installations, special-character and Arabic paths, exact preservation of unrelated PATH entries, backups, repeated runs, multiple versions, failed version checks, timeouts, denied writes, and rollback after verification failure. Two additional checks covered the full BAT launcher from a special-character path and the version check against the installed real Codex binary.
+
+These are controlled tests on Windows PowerShell 5.1, not certification across every Windows computer or future app release. No test modified the user's real saved PATH. Confirm Computer Use after restarting the desktop app.
 
 ## Author & contact
 
