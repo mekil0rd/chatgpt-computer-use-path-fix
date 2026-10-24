@@ -25,29 +25,37 @@ This is an independent contribution, not an official OpenAI tool. It targets PAT
 
 ## How to use
 
-1. Download the ZIP above and extract it.
-2. Open `Fix-ChatGPT-Computer-Use-PATH.ps1` in Notepad and review the code.
-3. **Before running the script, fully exit ChatGPT Desktop.** Use **Exit/Quit** from its menu or system-tray icon when available. Closing the window with **X** may leave the app running in the background.
-4. Open **Task Manager** with **Ctrl + Shift + Esc**. Check the Processes tab for **ChatGPT**. If it is still running, select its app/process group and choose **End task**. Confirm that the ChatGPT app processes have stopped before continuing.
-5. Open **Windows PowerShell** normally, without Administrator privileges.
-6. Copy the complete script from Notepad and paste it into PowerShell. Press Enter if needed.
-7. Read the result and compare it with **Expected output** below.
-8. Open ChatGPT Desktop again, select **Work → On my computer**, and retry Computer Use.
-9. If the app still uses the old environment, save your work, sign out of Windows and sign back in, then reopen ChatGPT and retry.
+1. Download the ZIP above and **extract it**. Run the extracted file, not the file inside the ZIP preview.
+2. **Fully exit ChatGPT Desktop before running the fix.** Use **Exit/Quit** from its menu or system-tray icon when available. Closing the window with **X** may leave it running.
+3. Open **Task Manager** with **Ctrl + Shift + Esc**. If **ChatGPT** is still running, select its app/process group and choose **End task**. Confirm its app processes have stopped.
+4. Right-click **`Fix-ChatGPT-Computer-Use-PATH.ps1`** and choose **Run with PowerShell**. On Windows 11, use **Show more options** if needed to find the command.
+5. A green welcome screen shows **Malek Alahmer**, the project name, and contact details. Read it, then press any key at **`Press any key to continue...`** to start.
+6. Read the result. The window stays open at **`Press any key to exit...`** so you can inspect the output before closing it. This final pause also appears if the script reports an error.
+7. Press any key to finish. Open ChatGPT Desktop again, select **Work → On my computer**, and retry Computer Use.
+8. If the app still uses the old environment, save your work, sign out of Windows and sign back in, then reopen ChatGPT and retry.
 
-The copy-and-paste method avoids changing PowerShell execution policy to run a downloaded file.
+Administrator privileges are not needed. In hosts without single-key input, the script falls back to an Enter prompt.
+
+### If Windows blocks the script
+
+The right-click command is subject to your computer's PowerShell execution policy. If Windows prevents the script from starting, the welcome screen and pauses cannot run. Read the Windows/PowerShell message; on a managed computer, ask the administrator. The script does not change execution policy. See [Microsoft's Run with PowerShell documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_run_with_powershell).
 
 ## Expected output
 
-After the introductory banner, a successful PATH update produces output similar to this:
+The welcome banner is green, the prompts are yellow, and status lines use green or cyan. After the welcome screen, a successful PATH update produces output similar to this:
 
 ```text
+Press any key to continue...
+
+Checking your Codex installation...
 Codex executable: C:\Users\<WindowsUser>\AppData\Local\OpenAI\Codex\bin\<CodexFolder>\codex.exe
 User PATH: UPDATED (backup: C:\Users\<WindowsUser>\codex-path-backup-YYYYMMDD-HHMMSS.txt)
 Found via PATH in this terminal: True
 Codex version: codex-cli 0.164.0-alpha.11.1
-NEXT: Fully quit ChatGPT, reopen it, select Work > On my computer, and retry Computer Use.
+NEXT: Open ChatGPT again, select Work > On my computer, and retry Computer Use.
 If still broken, sign out of Windows and sign back in, then retry.
+
+Press any key to exit...
 ```
 
 The username, folder, backup timestamp, and version are examples; they will differ between computers and app versions.
@@ -62,7 +70,7 @@ These messages confirm the script's checks. The final confirmation is that Compu
 
 ## What it does
 
-- Finds an existing local `codex.exe`, preferring the binary currently running app-server.
+- Finds an existing local `codex.exe`, preferring the binary currently running app-server when process inspection is available, otherwise checking installed files.
 - Checks that the selected executable responds to `--version`.
 - Saves a backup of User PATH before changing it.
 - Removes old per-version Codex folder entries from User PATH and puts the selected folder first.
@@ -89,15 +97,16 @@ If the Codex folder or executable is missing, this script reports an error inste
 
 أداة مجانية لمعالجة حالات خطأ التشغيل المذكور أعلاه عندما تكون المشكلة مرتبطة بمسار **PATH** في ويندوز.
 
-1. نزّل الملف المضغوط من **Download the project as ZIP** وفك الضغط.
-2. افتح ملف السكربت بالمفكرة وراجع محتواه.
-3. **قبل تشغيل السكربت، أغلق ChatGPT Desktop بالكامل باستخدام Exit أو Quit** من قائمة البرنامج أو أيقونته بجانب الساعة إن كان الخيار متاحًا. إغلاق النافذة بعلامة **X** وحده قد يترك البرنامج يعمل بالخلفية.
-4. افتح **Task Manager — مدير المهام** بالضغط على **Ctrl + Shift + Esc**. ابحث عن **ChatGPT** في تبويب العمليات. إذا بقي يعمل، حدّد مجموعة عمليات التطبيق واضغط **End task — إنهاء المهمة**. تأكد من توقف عمليات ChatGPT قبل المتابعة.
-5. افتح **Windows PowerShell** بشكل عادي، بدون تشغيل كمسؤول.
-6. انسخ الكود كاملًا من المفكرة والصقه في PowerShell، واضغط Enter عند الحاجة.
-7. راجع الناتج الموضح في قسم **Expected output** أعلاه، واقرأ تفسير الرسائل أدناه.
-8. افتح ChatGPT Desktop من جديد، واختر **Work → On my computer** ثم جرّب التحكم بالكمبيوتر.
-9. إذا استمرت المشكلة بسبب بقاء البيئة القديمة، احفظ شغلك وسجّل الخروج من ويندوز ثم ادخل مجددًا، وافتح ChatGPT وجرّب مرة أخرى.
+1. نزّل الملف المضغوط من **Download the project as ZIP** و**فك الضغط أولًا**. شغّل الملف المستخرج، وليس الملف داخل معاينة ZIP.
+2. **أغلق ChatGPT Desktop بالكامل باستخدام Exit أو Quit قبل تشغيل السكربت** من قائمة البرنامج أو أيقونته بجانب الساعة إن كان الخيار متاحًا. إغلاق النافذة بعلامة **X** وحده قد يتركه يعمل بالخلفية.
+3. افتح **Task Manager — مدير المهام** بالضغط على **Ctrl + Shift + Esc**. إذا بقي **ChatGPT** يعمل، حدّد مجموعة عمليات التطبيق واضغط **End task — إنهاء المهمة**. تأكد من توقف عملياته قبل المتابعة.
+4. اضغط بالزر الأيمن على **`Fix-ChatGPT-Computer-Use-PATH.ps1`** واختر **Run with PowerShell**. في ويندوز 11 قد تحتاج إلى **Show more options — إظهار المزيد من الخيارات**.
+5. ستظهر شاشة ترحيب خضراء باسم **Malek Alahmer** ومعلومات البرنامج والتواصل. اقرأها ثم اضغط أي زر عند **`Press any key to continue...`** لبدء الفحص والإصلاح.
+6. اقرأ الناتج؛ ستبقى النافذة مفتوحة عند **`Press any key to exit...`** حتى تضغط أي زر للخروج. تظهر وقفة الخروج أيضًا إذا حدث خطأ.
+7. افتح ChatGPT Desktop من جديد، واختر **Work → On my computer** ثم جرّب التحكم بالكمبيوتر.
+8. إذا بقي التطبيق يستخدم البيئة القديمة، احفظ شغلك وسجّل الخروج من ويندوز ثم ادخل مجددًا وأعد المحاولة.
+
+لا تحتاج إلى التشغيل كمسؤول. إذا كانت نافذة التشغيل لا تدعم ضغطة زر منفردة، سيطلب السكربت الضغط على Enter بدلًا منها.
 
 ### كيف تعرف نتيجة التشغيل؟
 
@@ -105,9 +114,11 @@ If the Codex folder or executable is missing, this script reports an error inste
 - ظهور **`Found via PATH in this terminal: True`** يعني أن PowerShell استطاع العثور على أمر Codex في النافذة الحالية.
 - سطر **`Codex version:`** يعرض الإصدار الموجود على جهازك؛ الرقم في المثال توضيحي وقد يختلف.
 - إذا ظهرت **`User PATH: already correctly configured.`** فالمسار مضبوط مسبقًا، وهذه نتيجة طبيعية ولا تُنشأ نسخة احتياطية جديدة في هذه الحالة.
-- إذا ظهرت **`FAILED:`** فاقرأ الخطأ، ولا تعتبر المحاولة ناجحة.
+- إذا ظهرت **`FAILED:`** فاقرأ الخطأ، ولا تعتبر المحاولة ناجحة. ستبقى النافذة مفتوحة حتى تضغط للخروج.
 
 اسم المستخدم والمسار ورقم الإصدار وتاريخ النسخة الاحتياطية في المثال تختلف حسب الجهاز. هذه الرسائل تؤكد فحوص السكربت؛ والتأكد النهائي من حل المشكلة يكون بنجاح التحكم بالكمبيوتر بعد إعادة فتح ChatGPT في **Work → On my computer**.
+
+إذا منع ويندوز تشغيل السكربت بسبب سياسة PowerShell، فلن يبدأ الكود ولن تظهر شاشة الترحيب. اقرأ رسالة النظام، وراجع مسؤول الجهاز إذا كان جهاز عمل مُدارًا. السكربت لا يغيّر سياسة تشغيل السكربتات.
 
 يحفظ السكربت نسخة احتياطية من User PATH قبل تغييره. يعالج حالات PATH المناسبة، ولا يضمن حل جميع أسباب الخطأ. هذه مساهمة مستقلة وليست أداة رسمية من OpenAI.
 
