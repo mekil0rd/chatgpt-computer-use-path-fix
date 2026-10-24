@@ -26,30 +26,62 @@
 # Windows PowerShell 5.1 / PowerShell 7; normal (non-admin) user account.
 # ============================================================================
 
-Write-Host '============================================================' -ForegroundColor Cyan
-Write-Host ' ChatGPT Computer Use - Codex PATH Fix | Malek Alahmer 2026' -ForegroundColor Cyan
-Write-Host ' Website:  https://goldcatalyst-ea.com/'
-Write-Host ' Support:  support@goldcatalyst-ea.com'
-Write-Host ' WhatsApp: https://wa.me/971555229072'
-Write-Host ' Free community fix - not an official OpenAI tool.'
-Write-Host '============================================================' -ForegroundColor Cyan
-
 $ErrorActionPreference = 'Stop'
 
+function Wait-ForKey {
+    param([string]$Message)
+    Write-Host ''
+    Write-Host $Message -ForegroundColor Yellow
+    try {
+        if ([Console]::IsInputRedirected) {
+            [void][Console]::ReadLine()
+        } else {
+            [void]$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+        }
+    } catch {
+        [void](Read-Host 'Press Enter')
+    }
+    Write-Host ''
+}
+
+Write-Host '============================================================' -ForegroundColor Green
+Write-Host ' ChatGPT Computer Use - Windows PATH Fix' -ForegroundColor Green
+Write-Host ' Created by Malek Alahmer | Copyright (c) 2026' -ForegroundColor Green
+Write-Host ' Website:  https://goldcatalyst-ea.com/' -ForegroundColor Green
+Write-Host ' Support:  support@goldcatalyst-ea.com' -ForegroundColor Green
+Write-Host ' WhatsApp: https://wa.me/971555229072' -ForegroundColor Green
+Write-Host '============================================================' -ForegroundColor Green
+Write-Host ' Free community tool. Not an official OpenAI tool.' -ForegroundColor Cyan
+Write-Host ' This checks an existing Codex installation and updates User PATH.' -ForegroundColor Cyan
+Write-Host ' A backup is saved before any User PATH change.' -ForegroundColor Cyan
+Write-Host ''
+Write-Host ' Before continuing: Exit ChatGPT completely.' -ForegroundColor Yellow
+Write-Host ' Check Task Manager and end remaining ChatGPT app processes.' -ForegroundColor Yellow
+Write-Host ' Closing only the window may leave ChatGPT running.' -ForegroundColor Yellow
+
 try {
+    Wait-ForKey 'Press any key to continue...'
+
+    Write-Host 'Checking your Codex installation...' -ForegroundColor Cyan
     $binRoot = Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin'
     if (-not (Test-Path -LiteralPath $binRoot -PathType Container)) {
         throw "Codex binary folder not found: $binRoot. Launch/update the desktop app first."
     }
 
     # Prefer the Codex binary actually running app-server, if one exists.
-    $running = @(Get-CimInstance Win32_Process -Filter "Name='codex.exe'" -ErrorAction SilentlyContinue |
+    $running = @()
+    try {
+        $running = @(Get-CimInstance Win32_Process -Filter "Name='codex.exe'" -ErrorAction SilentlyContinue |
         Where-Object {
             $_.ExecutablePath -and
             $_.ExecutablePath.StartsWith($binRoot + '\', [StringComparison]::OrdinalIgnoreCase) -and
             $_.CommandLine -match '(^|\s)app-server(\s|$)' -and
             (Test-Path -LiteralPath $_.ExecutablePath -PathType Leaf)
         })
+    } catch {
+        # Process inspection is optional; use the installed-file fallback.
+        $running = @()
+    }
 
     if ($running.Count -gt 0) {
         $exe = $running[0].ExecutablePath
@@ -89,25 +121,28 @@ try {
         $newPath += ';' + ($otherEntries -join ';')
     }
 
-    Write-Host "Codex executable: $exe"
+    Write-Host "Codex executable: $exe" -ForegroundColor Cyan
     if ($newPath -ceq $oldPath) {
-        Write-Host 'User PATH: already correctly configured.'
+        Write-Host 'User PATH: already correctly configured.' -ForegroundColor Green
     } else {
         $backup = Join-Path $env:USERPROFILE ('codex-path-backup-{0}.txt' -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
         [IO.File]::WriteAllText($backup, [string]$oldPath)
         [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
-        Write-Host "User PATH: UPDATED (backup: $backup)"
+        Write-Host "User PATH: UPDATED (backup: $backup)" -ForegroundColor Green
     }
 
     # Prioritize the selected Codex binary in this terminal for verification.
     $env:Path = $dir + ';' + $env:Path
     $resolved = Get-Command codex -ErrorAction SilentlyContinue
-    Write-Host ('Found via PATH in this terminal: ' + [bool]$resolved)
-    Write-Host ('Codex version: ' + ($version -join ' '))
-    Write-Host 'NEXT: Fully quit ChatGPT, reopen it, select Work > On my computer, and retry Computer Use.'
+    Write-Host ('Found via PATH in this terminal: ' + [bool]$resolved) -ForegroundColor $(if ($resolved) { 'Green' } else { 'Yellow' })
+    Write-Host ('Codex version: ' + ($version -join ' ')) -ForegroundColor Cyan
+    Write-Host 'NEXT: Open ChatGPT again, select Work > On my computer, and retry Computer Use.' -ForegroundColor Green
     Write-Host 'If still broken, sign out of Windows and sign back in, then retry.'
 }
 catch {
     Write-Host ('FAILED: ' + $_.Exception.Message) -ForegroundColor Red
-    Write-Host 'No additional fix was attempted. This PATH fix may not apply to your installation.'
+    Write-Host 'Review the error above. This PATH fix may not apply to your installation.' -ForegroundColor Yellow
+}
+finally {
+    Wait-ForKey 'Press any key to exit...'
 }
