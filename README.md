@@ -17,10 +17,6 @@ This is an independent contribution, not an official OpenAI tool. It targets PAT
 - [View and review the PowerShell script](./Fix-ChatGPT-Computer-Use-PATH.ps1)
 - [Open the raw script](https://raw.githubusercontent.com/mekil0rd/chatgpt-computer-use-path-fix/main/Fix-ChatGPT-Computer-Use-PATH.ps1)
 
-For YouTube descriptions, share this project page:
-
-https://github.com/mekil0rd/chatgpt-computer-use-path-fix
-
 ## Requirements
 
 - Windows with Windows PowerShell 5.1 or PowerShell 7.
