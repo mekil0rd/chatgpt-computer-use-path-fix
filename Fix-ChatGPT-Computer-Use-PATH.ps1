@@ -101,9 +101,23 @@ try {
     }
 
     # Verify the selected CLI responds before changing any PATH setting.
-    $version = & $exe --version 2>&1
-    if ($LASTEXITCODE -ne 0) {
+    # Windows PowerShell 5.1 can turn native stderr warnings into errors.
+    # Judge the version check by its exit code and actual version line.
+    $savedErrorPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $versionOutput = @(& $exe --version 2>&1)
+        $versionExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $savedErrorPreference
+    }
+    if ($versionExitCode -ne 0) {
         throw "The selected codex.exe did not pass the version check: $exe"
+    }
+    $version = @($versionOutput | ForEach-Object { [string]$_ } |
+        Where-Object { $_ -match '^codex-cli\s+' })
+    if ($version.Count -eq 0) {
+        throw "The selected codex.exe did not return a recognized version: $exe"
     }
 
     $dir = Split-Path -Path $exe -Parent
