@@ -1,139 +1,95 @@
-# ChatGPT Computer Use — Windows PATH Fix
+# ChatGPT Computer Use - Windows PATH Diagnostics & Recovery
 
-**Created by Malek Alahmer · 2026**
+**Created by Malek Alahmer | v2.0.0 | November 13, 2026**
 
-A free Windows utility for PATH-related instances of:
+Troubleshoot the Windows error `failed to launch codex app-server: program not found` and review PATH changes made by earlier versions of this community tool.
 
-```text
-failed to launch codex app-server: program not found
-```
+**Important update:** v2 replaces the old automatic PATH modification with **read-only diagnostics by default** and an **optional, confirmed legacy recovery**. It does not automatically repair a missing executable or guarantee a fix for repeated approval prompts. The historical filenames are retained so existing video/download links still work.
 
-**Recommended: extract the ZIP and double-click `Fix-ChatGPT-Computer-Use-PATH.bat`.**
+Independent community contribution. **Not an official OpenAI tool.**
 
-This is an independent community contribution, not an official OpenAI tool. It does not fix every Computer Use or app-server issue.
+## Download and run
 
-## Download
+**[Download the latest ZIP](https://github.com/mekil0rd/chatgpt-computer-use-path-fix/archive/refs/heads/main.zip)**
 
-**[Download ZIP](https://github.com/mekil0rd/chatgpt-computer-use-path-fix/archive/refs/heads/main.zip)**
+1. Download the latest ZIP and extract it into a normal folder. Review the source.
+2. Double-click **`Fix-ChatGPT-Computer-Use-PATH.bat`** normally from the Windows account experiencing the issue. **Administrator privileges are not required.**
+3. Choose an option:
 
-- [Review the standalone BAT file](./Fix-ChatGPT-Computer-Use-PATH.bat)
-- [Optional PowerShell source](./Fix-ChatGPT-Computer-Use-PATH.ps1)
-
-The BAT contains its own readable PowerShell source. It does not need the separate PS1 file to run.
-
-## How to use
-
-1. Download the ZIP and **extract it** into a normal folder.
-2. **Fully exit ChatGPT Desktop** using Exit/Quit from its menu or system-tray icon when available. Closing the window with X may leave the app running.
-3. Press **Ctrl + Shift + Esc** to open Task Manager. If ChatGPT is still running, select its app/process group and choose **End task**. Confirm its app processes have stopped.
-4. Double-click **`Fix-ChatGPT-Computer-Use-PATH.bat`** in the extracted folder. Review the source before running it.
-5. A **green welcome screen** displays the project name, **Malek Alahmer**, and contact details.
-6. At **`Press any key to continue...`**, press a key to start the checks.
-7. Read the result. The window stays open at **`Press any key to exit...`**, including when the utility reports an error.
-8. Press a key to finish, reopen ChatGPT Desktop, and select **Work → On my computer** to retry Computer Use.
-9. If the app still uses the old environment, save your work, sign out of Windows, and sign back in before retrying.
-
-No Administrator privileges are needed. In hosts without single-key input, the utility falls back to an Enter prompt.
-
-## Expected output
-
-After the green welcome banner, a successful update looks similar to:
-
-```text
-Press any key to continue...
-
-Checking your Codex installation...
-Codex executable: C:\Users\<WindowsUser>\AppData\Local\OpenAI\Codex\bin\<CodexFolder>\codex.exe
-User PATH: UPDATED (backup: C:\Users\<WindowsUser>\codex-path-backup-YYYYMMDD-HHMMSS-mmm-<unique-id>.txt)
-Found via PATH in this terminal: True
-Saved User PATH: VERIFIED
-Codex version: codex-cli 0.164.0-alpha.11.1
-NEXT: Open ChatGPT again, select Work > On my computer, and retry Computer Use.
-If still broken, sign out of Windows and sign back in, then retry.
-
-Press any key to exit...
-```
-
-Usernames, paths, timestamps, and version numbers vary by computer.
-
-| Message | Meaning |
+| Choice | Result |
 | --- | --- |
-| `User PATH: UPDATED` | The previous User PATH was backed up and the updated value was saved. |
-| `User PATH: already correctly configured.` | The selected folder is already configured; no new backup is needed. |
-| `Found via PATH in this terminal: True` | Codex can be found in the current terminal. |
-| `Saved User PATH: VERIFIED` | The stored User PATH matches the intended value. |
-| `Codex version:` | The selected executable returned a recognized version. |
-| `FAILED:` | Read the error; do not treat the run as a successful fix. |
+| Enter | Read-only diagnostics. No settings are changed. |
+| U, then Enter | Preview legacy Codex entries in User PATH. A separate confirmation appears before any change. |
+| Q, then Enter | Quit without changes. |
 
-The final confirmation is that Computer Use works after reopening ChatGPT.
+4. Read the output. Press Enter to close the window.
 
-## Requirements
+The BAT is standalone and contains the same readable PowerShell source as the separate [PS1 file](./Fix-ChatGPT-Computer-Use-PATH.ps1). It does not download scripts at runtime. Windows PowerShell 5.1 is used by the launcher. Organization-managed application controls may block it; do not disable protections to run it.
 
-- Windows with the built-in **Windows PowerShell 5.1**.
-- An existing desktop app installation using one of the supported paths listed below.
-- Permission to run a batch file and PowerShell commands on the computer. Organization-managed application controls can still prevent execution.
+## New users seeing `program not found`
 
-## Supported installation paths
+Start with diagnostics. The tool reports command discovery **in its own terminal**, matching User PATH entries, and existing executables under the historical `%LOCALAPPDATA%\OpenAI\Codex\bin` layout. Other installation layouts are not assessed.
 
-The utility uses each Windows account's own `LOCALAPPDATA`, `USERPROFILE`, and `SystemRoot` values. No username or Windows drive is hard-coded.
+It cannot establish which executable your ChatGPT app needs from a filename, modification date, or `--version` result. It therefore **does not choose a version or add a version folder to PATH**.
 
-It checks these layouts:
+Save your work, fully exit ChatGPT, reopen it, and check for an official app update. If the error persists, follow official app repair/support guidance for your installation. No automatic repair for this launch error is provided in v2. Removing PATH entries can also make software that relies on them stop finding Codex by name.
 
-```text
-%LOCALAPPDATA%\OpenAI\Codex\bin\<version-folder>\codex.exe
-%LOCALAPPDATA%\OpenAI\Codex\bin\codex.exe
-```
+## Used an earlier version of this tool?
 
-When available, the running app-server's executable is tried first. Other candidates are tried by file modification time, newest first. An unusable candidate is skipped; each version check has a 10-second limit. If no usable executable is found, the utility stops before changing User PATH. Different installation layouts require separate investigation.
+Earlier releases permanently placed a selected Codex installation folder in User PATH. That could influence executable lookup after app updates. In the author's reported case, repeated approval prompts stopped after removing these entries and restarting. **The internal cause and general applicability have not been established.** Recovery is not a guaranteed fix for approval prompts or launch errors.
 
-## What the utility does
-
-- Finds and tests existing Codex executables in the supported locations, with fallback between candidates.
-- Checks its exit code and version; native warning messages alone do not fail a valid version check.
-- Backs up User PATH before changing it.
-- Replaces old per-version Codex folder entries with the selected folder, preserving unrelated entries.
-- Reads the saved User PATH back to verify it, and verifies that command discovery selects the chosen executable.
-- On a post-write verification failure, restores the previous User PATH if its value still matches the utility's update. If another process changed it, automatic restoration is skipped to avoid overwriting that change.
-
-It does not download or install software, modify Machine PATH, or request Administrator privileges.
-
-## Why the BAT version is recommended
-
-Direct **Run with PowerShell** on a PS1 file can be blocked before the script starts. Its own welcome screen and pauses cannot display when PowerShell refuses to load the file.
-
-The BAT starts the built-in Windows PowerShell and invokes its readable embedded source as commands. It does not change saved execution-policy settings, use an ExecutionPolicy Bypass argument, or remove download security marks.
-
-The separate PS1 file is available as source for users whose environment allows direct script execution. Do not use it as the default launch file.
-
-## File names and language
-
-All program messages and file names are in English. File Explorer's **Type** label is generated by Windows and its installed language resources. A translated Type label does not mean the file contents are Arabic. This package does not change Windows language or file associations.
-
-## Backup and recovery
-
-When User PATH changes, the old value is saved in your Windows user folder as:
+Choose **U** to preview removal of entries matching exactly:
 
 ```text
-codex-path-backup-YYYYMMDD-HHMMSS.txt
+%LOCALAPPDATA%\OpenAI\Codex\bin
+%LOCALAPPDATA%\OpenAI\Codex\bin\<one-folder>
 ```
 
-The utility prints the exact backup location. To undo the change, restore the backup's exact contents to **Path** under **Environment Variables → User variables**, then sign out of Windows and sign back in. Do not replace Machine PATH.
+Matching is case-insensitive and handles quoted entries, environment-variable references, and trailing backslashes. Deeper descendants and other accounts' paths are preserved. PATH alone cannot prove who added an entry: continue only if you used the old tool or deliberately want the listed entries removed. Entries are matched even if the folder no longer exists.
 
-## Limits
+After confirmation, recovery:
 
-A missing or unsupported Codex installation must be resolved separately. The utility refuses ambiguous semicolon-containing installation paths and overly long User PATH values before writing. A successful version check does not guarantee all Computer Use features work. Future app updates can change the executable location and require checking PATH again.
+- Saves a unique JSON backup in your Windows user folder **before writing**.
+- Preserves unrelated entries, their order, empty entries, raw environment-variable references, and the registry value type.
+- Checks for a changed User PATH before writing and stops if it detects one. This is a check, not a registry transaction; avoid concurrent environment edits.
+- Removes only the previewed entries from **User PATH**, then reads the value back to verify it.
+- Reports failures, including denied writes, without claiming successful recovery.
 
-## Validation
+It does not delete Codex files, modify Machine PATH, or change permissions, approval rules, execution policy, antivirus settings, or app configuration. It does not stop apps or restart Windows.
 
-The reviewed version passed 16 isolated scenarios covering missing installations, special-character and Arabic paths, exact preservation of unrelated PATH entries, backups, repeated runs, multiple versions, failed version checks, timeouts, denied writes, and rollback after verification failure. Two additional checks covered the full BAT launcher from a special-character path and the version check against the installed real Codex binary.
+After successful recovery, save your work, fully exit ChatGPT, **sign out of Windows and sign back in** so apps receive the refreshed environment. Retry Computer Use and check the approval behavior. A green recovery message verifies PATH storage, not end-to-end app behavior.
 
-These are controlled tests on Windows PowerShell 5.1, not certification across every Windows computer or future app release. No test modified the user's real saved PATH. Confirm Computer Use after restarting the desktop app.
+## Backups and manual recovery
 
-## Author & contact
+The tool prints the exact backup path:
+
+```text
+%USERPROFILE%\codex-path-recovery-YYYYMMDD-HHMMSS-<unique-id>.json
+```
+
+The JSON records `Before`, `After`, `Removed`, and `RegistryKind`. Keep it locally; it may contain personal folder names. To undo this recovery, review `Before` and restore the intended entries under **Environment Variables > User variables > Path**. Do not replace Machine PATH or blindly overwrite environment changes made since the backup. Earlier `codex-path-backup-*.txt` files remain untouched; v2 does not automatically restore them because they may contain outdated unrelated settings.
+
+## Source and tests
+
+- [Standalone BAT](./Fix-ChatGPT-Computer-Use-PATH.bat)
+- [PowerShell source](./Fix-ChatGPT-Computer-Use-PATH.ps1)
+- [Isolated recovery tests](./tests/Test-Recovery.ps1)
+
+The v2 test suite passed **20 isolated cases on Windows PowerShell 5.1**, including raw entry preservation, multiple legacy entries, quoted/Unicode paths, other account paths, repeated recovery, WhatIf, concurrent edits, backup failure, denied writes, and BAT/source equality. Registry write and backup operations in the recovery tests are mocked in memory. A separate real BAT launch checks the default diagnostic path without changing User PATH.
+
+These checks validate the utility, not every Windows installation, future app update, or end-to-end ChatGPT approval behavior. Previous version test results do not certify v2.
+
+For developers, dot-source the PS1 to load functions without opening the menu. `Undo-LegacyPath -WhatIf` previews recovery without writing; `Undo-LegacyPath` prompts before writing. Direct PS1 execution depends on your existing execution policy; the BAT is the intended launch file and does not change saved execution-policy settings.
+
+## Video correction
+
+The video demonstrates launching a BAT file. Download the **current** version and follow this README and its on-screen menu: older footage showing automatic PATH updates or an administrator launch no longer describes the current behavior. Diagnostics is now the default; legacy recovery is optional.
+
+## Author and contact
 
 - **Malek Alahmer**
 - Website: https://goldcatalyst-ea.com/
 - Email: support@goldcatalyst-ea.com
 - WhatsApp: https://wa.me/971555229072
 
-Copyright © 2026 Malek Alahmer.
+Copyright (c) 2026 Malek Alahmer.
